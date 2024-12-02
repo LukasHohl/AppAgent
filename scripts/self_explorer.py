@@ -32,7 +32,7 @@ elif configs["MODEL"] == "Qwen":
                      model=configs["QWEN_MODEL"])
 else:
     print_with_color(f"ERROR: Unsupported model type {configs['MODEL']}!", "red")
-    sys.exit()
+    sys.exit() #todo remove duplicate code?
 
 app = args["app"]
 root_dir = args["root_dir"]

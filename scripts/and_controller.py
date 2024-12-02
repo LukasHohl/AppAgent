@@ -151,7 +151,7 @@ class AndroidController:
         ret = execute_adb(adb_command)
         return ret
 
-    def swipe(self, x, y, direction, dist="medium", quick=False):
+    def swipe(self, x, y, direction, dist="medium", quick=False): #Todo es muss doch einen besseren Weg geben start und ende zu wählen?
         unit_dist = int(self.width / 10)
         if dist == "long":
             unit_dist *= 3
@@ -175,6 +175,6 @@ class AndroidController:
     def swipe_precise(self, start, end, duration=400):
         start_x, start_y = start
         end_x, end_y = end
-        adb_command = f"adb -s {self.device} shell input swipe {start_x} {start_x} {end_x} {end_y} {duration}"
+        adb_command = f"adb -s {self.device} shell input swipe {start_x} {start_y} {end_x} {end_y} {duration}"
         ret = execute_adb(adb_command)
         return ret
