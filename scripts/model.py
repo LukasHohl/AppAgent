@@ -63,7 +63,7 @@ class OpenAIModel(BaseModel):
             prompt_tokens = usage["prompt_tokens"]
             completion_tokens = usage["completion_tokens"]
             print_with_color(f"Request cost is "
-                             f"${'{0:.2f}'.format(prompt_tokens / 1000 * 0.01 + completion_tokens / 1000 * 0.03)}",
+                             f"${'{0:.2f}'.format(prompt_tokens / 1000000 * 0.15 + completion_tokens / 1000000 * 0.6)}",
                              "yellow")
         else:
             return False, response["error"]["message"]
@@ -91,11 +91,12 @@ class QwenModel(BaseModel):
                 "content": content
             }
         ]
+        print("Point1")
         response = dashscope.MultiModalConversation.call(model=self.model, messages=messages)
         if response.status_code == HTTPStatus.OK:
-            return True, response.output.choices[0].message.content[0]["text"]
+            return (True, response.output.choices[0].message.content[0]["text"])
         else:
-            return False, response.message
+            return (False, response.message)
 
 
 def parse_explore_rsp(rsp):
@@ -195,6 +196,7 @@ def parse_reflect_rsp(rsp):
         print_with_color(decision, "magenta")
         print_with_color("Thought:", "yellow")
         print_with_color(think, "magenta")
+        decision = decision.strip()
         if decision == "INEFFECTIVE":
             return [decision, think]
         elif decision == "BACK" or decision == "CONTINUE" or decision == "SUCCESS":
@@ -203,6 +205,7 @@ def parse_reflect_rsp(rsp):
             print_with_color(doc, "magenta")
             return [decision, think, doc]
         else:
+            print("Here it goes wrong.") #TODO fix whatever this is
             print_with_color(f"ERROR: Undefined decision {decision}!", "red")
             return ["ERROR"]
     except Exception as e:

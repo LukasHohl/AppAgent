@@ -1,0 +1,1 @@
+{'tap': "The UI element is intended to initiate the backup process for photos and videos, guiding users through the setup of Google Photos' backup features.", 'text': '', 'v_swipe': '', 'h_swipe': '', 'long_press': ''}

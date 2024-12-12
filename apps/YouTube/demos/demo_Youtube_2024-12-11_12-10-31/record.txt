@@ -1,0 +1,13 @@
+tap(3):::android.view.ViewGroup_126_126_com.google.android.youtube.id_menu_item_view_Search_0
+text(2:sep:"Alligatoah"):::com.google.android.youtube.id_search_box_com.google.android.youtube.id_search_edit_text_0
+tap(5):::com.google.android.youtube.id_linearLayout_com.google.android.youtube.id_edit_suggestion_2
+text(2:sep:"\n"):::com.google.android.youtube.id_search_box_com.google.android.youtube.id_search_edit_text_0
+tap(1):::com.google.android.youtube.id_toolbar_android.widget.ImageButton_147_126_Navigateup_0
+tap(3):::android.view.ViewGroup_126_126_com.google.android.youtube.id_menu_item_view_Search_0
+tap(4):::com.google.android.youtube.id_linearLayout_com.google.android.youtube.id_edit_suggestion_3
+tap(1):::com.google.android.youtube.id_toolbar_android.widget.ImageButton_147_126_Navigateup_0
+tap(3):::android.view.ViewGroup_126_126_com.google.android.youtube.id_menu_item_view_Search_0
+text(2:sep:"'Alligatoah\n'"):::com.google.android.youtube.id_search_box_com.google.android.youtube.id_search_edit_text_0
+tap(1):::com.google.android.youtube.id_toolbar_android.widget.ImageButton_147_126_Navigateup_0
+tap(3):::android.view.ViewGroup_126_126_com.google.android.youtube.id_menu_item_view_Search_0
+text(2:sep:"'Alligatoah/n'"):::com.google.android.youtube.id_search_box_com.google.android.youtube.id_search_edit_text_0

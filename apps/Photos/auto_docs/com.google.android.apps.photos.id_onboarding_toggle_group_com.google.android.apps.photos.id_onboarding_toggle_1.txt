@@ -1,0 +1,1 @@
+{'tap': 'The UI element allows users to manage backup settings for their photos and videos, indicating a choice to proceed without enabling backup.', 'text': '', 'v_swipe': '', 'h_swipe': '', 'long_press': ''}

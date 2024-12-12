@@ -10,15 +10,17 @@ import time
 import prompts
 from config import load_config
 from and_controller import list_all_devices, AndroidController, traverse_tree
-from model import parse_explore_rsp, parse_grid_rsp, OpenAIModel, QwenModel
-from utils import print_with_color, draw_bbox_multi, draw_grid
+from model import parse_explore_rsp, parse_grid_rsp, OpenAIModel, QwenModel # TODO look where the grid respones is used
+from utils import print_with_color, draw_bbox_multi, draw_grid # draw grid is interesting
 
+#there are two arguments the app name and the root directory, this is rather pointless
 arg_desc = "AppAgent Executor"
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=arg_desc)
 parser.add_argument("--app")
 parser.add_argument("--root_dir", default="./")
 args = vars(parser.parse_args())
 
+#now the information about the LLM is loaded from config.yaml
 configs = load_config()
 
 if configs["MODEL"] == "OpenAI":
@@ -33,6 +35,8 @@ elif configs["MODEL"] == "Qwen":
 else:
     print_with_color(f"ERROR: Unsupported model type {configs['MODEL']}!", "red")
     sys.exit()
+
+#load the app name and the directory names as variables
 
 app = args["app"]
 root_dir = args["root_dir"]

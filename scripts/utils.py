@@ -28,6 +28,7 @@ def print_with_color(text: str, color=""):
 
 
 def draw_bbox_multi(img_path, output_path, elem_list, record_mode=False, dark_mode=False):
+    #
     imgcv = cv2.imread(img_path)
     count = 1
     for elem in elem_list:

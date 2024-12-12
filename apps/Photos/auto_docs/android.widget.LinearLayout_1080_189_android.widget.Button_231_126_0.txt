@@ -1,0 +1,1 @@
+{'tap': 'The UI element is intended to allow the user to proceed to the next step in the sign-in process after entering their email or phone number.', 'text': '', 'v_swipe': '', 'h_swipe': '', 'long_press': ''}

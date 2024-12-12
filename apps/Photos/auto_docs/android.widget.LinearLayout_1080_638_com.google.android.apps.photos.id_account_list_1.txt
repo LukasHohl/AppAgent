@@ -1,0 +1,1 @@
+{'tap': 'The UI element allows the user to select an existing Google account, facilitating access to the associated photos and features within the Google Photos app.', 'text': '', 'v_swipe': '', 'h_swipe': '', 'long_press': ''}

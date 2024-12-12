@@ -13,12 +13,15 @@ from and_controller import list_all_devices, AndroidController, traverse_tree
 from model import parse_explore_rsp, parse_reflect_rsp, OpenAIModel, QwenModel
 from utils import print_with_color, draw_bbox_multi
 
+#import you know them you love them
+
 arg_desc = "AppAgent - Autonomous Exploration"
+print(arg_desc)
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=arg_desc)
 parser.add_argument("--app")
 parser.add_argument("--root_dir", default="./")
 args = vars(parser.parse_args())
-
+#argument stuff
 configs = load_config()
 
 if configs["MODEL"] == "OpenAI":
@@ -34,6 +37,7 @@ else:
     print_with_color(f"ERROR: Unsupported model type {configs['MODEL']}!", "red")
     sys.exit() #todo remove duplicate code?
 
+#load the LLM stuff
 app = args["app"]
 root_dir = args["root_dir"]
 
@@ -51,6 +55,7 @@ if not os.path.exists(work_dir):
 demo_dir = os.path.join(work_dir, "demos")
 if not os.path.exists(demo_dir):
     os.mkdir(demo_dir)
+#so here is the 
 demo_timestamp = int(time.time())
 task_name = datetime.datetime.fromtimestamp(demo_timestamp).strftime("self_explore_%Y-%m-%d_%H-%M-%S")
 task_dir = os.path.join(demo_dir, task_name)
@@ -58,6 +63,8 @@ os.mkdir(task_dir)
 docs_dir = os.path.join(work_dir, "auto_docs")
 if not os.path.exists(docs_dir):
     os.mkdir(docs_dir)
+
+#ein reflect und ein explore log Was kommt da rein, außer viel text?
 explore_log_path = os.path.join(task_dir, f"log_explore_{task_name}.txt")
 reflect_log_path = os.path.join(task_dir, f"log_reflect_{task_name}.txt")
 
@@ -79,23 +86,26 @@ if not width and not height:
     sys.exit()
 print_with_color(f"Screen resolution of {device}: {width}x{height}", "yellow")
 
+#get the user to input the task description
 print_with_color("Please enter the description of the task you want me to complete in a few sentences:", "blue")
 task_desc = input()
 
 round_count = 0
 doc_count = 0
-useless_list = set()
-last_act = "None"
-task_complete = False
-while round_count < configs["MAX_ROUNDS"]:
+useless_list = set() # what is this supposed to be?
+last_act = "None" # so we have acts? What are acts? where is the difference to actions?
+task_complete = False #obvious
+while round_count < configs["MAX_ROUNDS"]: # only try so long to achieve the result
     round_count += 1
-    print_with_color(f"Round {round_count}", "yellow")
+    print_with_color(f"Round {round_count}", "yellow") # so this is the strange number at the start of some lines
+    #get screenshot and xml
     screenshot_before = controller.get_screenshot(f"{round_count}_before", task_dir)
     xml_path = controller.get_xml(f"{round_count}", task_dir)
     if screenshot_before == "ERROR" or xml_path == "ERROR":
         break
     clickable_list = []
     focusable_list = []
+    #this here looks like code duplication I have already seen this code.
     traverse_tree(xml_path, clickable_list, "clickable", True)
     traverse_tree(xml_path, focusable_list, "focusable", True)
     elem_list = []
@@ -104,7 +114,7 @@ while round_count < configs["MAX_ROUNDS"]:
             continue
         elem_list.append(elem)
     for elem in focusable_list:
-        if elem.uid in useless_list:
+        if elem.uid in useless_list: # so useless elements are ignored, but what elements are useless?
             continue
         bbox = elem.bbox
         center = (bbox[0][0] + bbox[1][0]) // 2, (bbox[0][1] + bbox[1][1]) // 2
@@ -118,6 +128,8 @@ while round_count < configs["MAX_ROUNDS"]:
                 break
         if not close:
             elem_list.append(elem)
+        # so to the list of clickable elements we add all focusable elements, that are not too close or useless?
+        #then we draw boxes with numbers in them for these elements
     draw_bbox_multi(screenshot_before, os.path.join(task_dir, f"{round_count}_before_labeled.png"), elem_list,
                     dark_mode=configs["DARK_MODE"])
 
@@ -125,17 +137,20 @@ while round_count < configs["MAX_ROUNDS"]:
     prompt = re.sub(r"<last_act>", last_act, prompt)
     base64_img_before = os.path.join(task_dir, f"{round_count}_before_labeled.png")
     print_with_color("Thinking about what to do in the next step...", "yellow")
+    #so we give some task description and the latest labled image to the llm to ask it for an action?
     status, rsp = mllm.get_model_response(prompt, [base64_img_before])
 
-    if status:
+    if status: # wenn du eine antwort bekommen hast
         with open(explore_log_path, "a") as logfile:
             log_item = {"step": round_count, "prompt": prompt, "image": f"{round_count}_before_labeled.png",
                         "response": rsp}
-            logfile.write(json.dumps(log_item) + "\n")
+            logfile.write(json.dumps(log_item) + "\n") # it seems for each round with an answere this explore stuff
+            #is dumped as json (dictionary?) in the logfile
         res = parse_explore_rsp(rsp)
         act_name = res[0]
         last_act = res[-1]
         res = res[:-1]
+        #here the act is actually done
         if act_name == "FINISH":
             task_complete = True
             break
@@ -176,6 +191,7 @@ while round_count < configs["MAX_ROUNDS"]:
         print_with_color(rsp, "red")
         break
 
+    #so now we get the screenshot for what happend after and get some lables
     screenshot_after = controller.get_screenshot(f"{round_count}_after", task_dir)
     if screenshot_after == "ERROR":
         break
@@ -183,6 +199,7 @@ while round_count < configs["MAX_ROUNDS"]:
                     dark_mode=configs["DARK_MODE"])
     base64_img_after = os.path.join(task_dir, f"{round_count}_after_labeled.png")
 
+    #now we ask the llm to reflect if our action was successful
     if act_name == "tap":
         prompt = re.sub(r"<action>", "tapping", prompts.self_explore_reflect_template)
     elif act_name == "text":
@@ -203,6 +220,7 @@ while round_count < configs["MAX_ROUNDS"]:
     prompt = re.sub(r"<task_desc>", task_desc, prompt)
     prompt = re.sub(r"<last_act>", last_act, prompt)
 
+    #here we get the reflection
     print_with_color("Reflecting on my previous action...", "yellow")
     status, rsp = mllm.get_model_response(prompt, [base64_img_before, base64_img_after])
     if status:
@@ -211,8 +229,10 @@ while round_count < configs["MAX_ROUNDS"]:
             log_item = {"step": round_count, "prompt": prompt, "image_before": f"{round_count}_before_labeled.png",
                         "image_after": f"{round_count}_after.png", "response": rsp}
             logfile.write(json.dumps(log_item) + "\n")
-        res = parse_reflect_rsp(rsp)
+        res = parse_reflect_rsp(rsp) #maybe here is something wrong? Fixed it
         decision = res[0]
+        #depending on the decision stuff happens, success just means,
+        #that the decision was effective, this is different than stop
         if decision == "ERROR":
             break
         if decision == "INEFFECTIVE":
@@ -231,8 +251,9 @@ while round_count < configs["MAX_ROUNDS"]:
             doc_name = resource_id + ".txt"
             doc_path = os.path.join(docs_dir, doc_name)
             if os.path.exists(doc_path):
+                #why the f are there only 5 .txt docs I called this function more times than that?
                 doc_content = ast.literal_eval(open(doc_path).read())
-                if doc_content[act_name]:
+                if doc_content[act_name]: # so for each resource_id there is an extra documentation
                     print_with_color(f"Documentation for the element {resource_id} already exists.", "yellow")
                     continue
             else:
@@ -263,3 +284,4 @@ elif round_count == configs["MAX_ROUNDS"]:
                      "yellow")
 else:
     print_with_color(f"Autonomous exploration finished unexpectedly. {doc_count} docs generated.", "red")
+#something seems wrong with the doc generation, but I am not running this code, so I am not fixing it.

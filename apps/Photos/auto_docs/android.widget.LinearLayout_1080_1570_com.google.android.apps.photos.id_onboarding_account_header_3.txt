@@ -1,0 +1,1 @@
+{'tap': 'The UI element allows users to choose an account for accessing Google Photos, which is necessary for managing photo backups and settings.', 'text': '', 'v_swipe': '', 'h_swipe': '', 'long_press': ''}
